@@ -1,0 +1,134 @@
+{%extends 'base.html'%}
+    
+    {%block title%}Result{%endblock%}
+    {% block chart_style %}
+    .chartBox {
+        width:400px;
+    }
+    {% endblock chart_style %}
+    {%load static%}
+    {%block content%}
+
+    <nav class="navbar navbar-expand-lg bg-light text-dark">
+        <div class="container">
+            <a class="navbar-brand">Aptitude</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aira-label="Tpgglenavigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse float-end" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link text-dark" href="{%url 'Home'%}">Home</a>
+                    <a class="nav-link text-dark" href="{%url 'Branches'%}">Branches</a>
+                    {%if user.is_authenticated%}
+                        <a href="{% url 'Result_Branch' %}" class="nav-link text-dark float-end">Results</a>
+                        <a href="{% url 'logout' %}" class="nav-link text-dark float-end">Logout</a>
+                    {% endif %}
+                    
+                </div>				
+            </div>
+        </div>
+    </nav>
+    
+    <header>
+      
+        <!-- Jumbotron -->
+      <div class="p-5 text-center bg-dark">
+          <h1 class="mb-3 text-light ">Result</h1><br>
+        <!-- Jumbotron -->
+      
+      </div>
+        
+    </header>
+    <div class="mt-1 mx-auto d-grid col-5 text-center">
+    <h4 class="my-4"><span>Branch: {{branch}}</span><span class="space">Category: {{category}}</span></h4>
+    </div>
+    <h4 class="my-4">Attempted Questions</h4>
+
+    <div class="chartBox">
+        <canvas id="myChart"> </canvas>
+    </div>
+    <br>
+    <h5>Total Attempted {{attempted}} </h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Submitted Answer</th>
+                <th>Right Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for row in result%}
+                {% if row.right_answer != "Not Submitted" %}
+                <tr>
+                    <td>{{row.id}}</td>
+                    <td>{{row.question}}</td>
+                    {% if row.right_answer == row.question.correct_option %}
+                        <td class="bg-success text-white">{{row.right_answer}}</td>
+                    {% else %}
+                        <td class="bg-danger text-white">{{row.right_answer}}</td>
+                    {% endif %}
+                    <td>{{row.question.correct_option}}</td>
+                    
+                </tr>
+            {% endif %}
+            {%endfor%}
+        </tbody>
+    </table>
+    
+
+    
+    <h2 class="my-4">Skipped Questions</h2>
+    <h4>Total Skipped {{total_skipped}} </h4>
+    {% if total_skipped != 0 %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Right Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for row in result%}
+                {% if row.right_answer == "Not Submitted" %}
+                <tr>
+                    <td>{{row.id}}</td>
+                    <td>{{row.question}}</td>
+                    <td>{{row.question.correct_option}}</td>
+                    
+                </tr>
+                {% endif %}
+            {%endfor%}
+        </tbody>
+    </table>
+    {% endif %}
+
+    
+
+    {% endblock %}
+
+{%block script_js%}
+
+    const ctx = document.getElementById('myChart');
+  
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Correct_Answers','Incorrect_Answers','Skipped_Questions'],
+        datasets: [{
+        
+          data: [{{RightAns}}, {{WrongAns}}, {{total_skipped}}],
+          borderWidth: 1,
+          backgroundColor:[
+          'rgb(69, 191, 85)',
+          'rgb(212, 13, 18)',
+          'rgb(255, 235, 59)'
+          ]
+        }]
+      },
+      options: {}
+    });
+  
+{%endblock script_js%}

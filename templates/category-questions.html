@@ -1,0 +1,83 @@
+{%extends 'base.html'%}
+    
+    {%block title%}Questions{%endblock%}
+    {%load static%}
+    {%block content%}
+
+    <nav class="navbar navbar-expand-lg bg-light text-dark">
+        <div class="container">
+            <a class="navbar-brand">Aptitude</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aira-label="Tpgglenavigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse float-end" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="{%url 'Home'%}">Home</a>
+                    <a class="nav-link" href="{%url 'Branches'%}">Branches</a>
+                     <!-- <a class="nav-link" href="{%url 'login'%}">Login</a>
+                    <a class="nav-link" href="{%url 'register'%}">Register</a> -->
+                    
+                </div>				
+            </div>
+        </div>
+    </nav>
+
+    <div class="card my-4 border-dark shadow">
+        <h4><span class='timer float-end mx-2' id="s_timer"></span></h4>
+        <h4 class="card-header">{{question.question}}</h4>
+
+        <form method="post" action="{% url 'submit_answer' category.id branch_id question.id%}">
+            {%csrf_token%}
+            <div class="card-body">
+                <table class="table table-hover table-borderless w-auto">
+                    <tr>
+                        <th><input  value="{{question.option_1}}" id="option_1" type="radio" name="answer"></th>
+                        <td><label for="option_1">{{question.option_1}}</label></td>
+                    </tr>
+                    <tr>
+                        <td><input  value="{{question.option_2}}" id="option_2" type="radio" name="answer"></td>
+                        <td><label for="option_2">{{question.option_2}}</label></td>
+                    </tr>
+                    <tr>
+                        <td><input value="{{question.option_3}}" id="option_3" type="radio" name="answer"></td>
+                        <td><label for="option_3">{{question.option_3}}</label></td>
+                    </tr>
+                    <tr>
+                        <td><input  value="{{question.option_4}}" id="option_4" type="radio" name="answer"></td>
+                        <td><label for="option_4">{{question.option_4}}</label></td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <div class="card-footer">
+                <input type="submit" value="Skip" class="btn btn-warning skipBtn" name="skip">
+                <input type="submit" value="submit" class="btn btn-primary submitBtn" name="submit">
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{% static 'js/jQuery-countdownTimer/jquery.countdownTimer.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".submitBtn").on("click",function(){
+            var _checkedAns = $("input[name='answer']:checked").val();
+            if(_checkedAns==undefined)
+            {
+                alert("Select Option");
+                return false;
+            };
+
+        });
+
+        $("#s_timer").countdowntimer({
+            seconds : 60,
+            size : "sm",
+            timeUp:function(){
+                $(".skipBtn").trigger('click');
+            }
+        });
+
+    });
+   
+</script>
+
+    {%endblock%}
